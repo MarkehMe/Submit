@@ -1,0 +1,27 @@
+name: Submit
+main: markehme.submit.Submit
+authors: ['MarkehMe']
+website: http://markeh.me
+version: 1.0.0
+dev-url: http://dev.bukkit.org/bukkit-plugins/submit/
+depend: [ Vault ] 
+commands:
+  submit:
+    description: Submit to the current competition! 
+    usage: "Usage: '/submit [optionalargument]'"
+permissions:
+  submit.use:
+    default: true
+    description: allows making a submission with /submit
+  submit.list:
+    default: false
+    description: allows using /submit list
+  submit.clear:
+    default: false
+    description: allows using /submit clear
+  submit.open:
+    default: false
+    description: allows using /submit open/close
+  submit.view:
+    default: false
+    description: allows using /submit view <player>
