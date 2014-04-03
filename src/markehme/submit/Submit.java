@@ -17,7 +17,7 @@ public class Submit extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {
-	
+		
 		saveDefaultConfig();
 		
 		saveConfig();
