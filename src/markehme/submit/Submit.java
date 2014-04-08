@@ -42,7 +42,7 @@ public class Submit extends JavaPlugin {
 			if(args.length > 0) {
 				
 				if(args[0].equals("list")) {
-					if(!permission.playerHas(player, "submit.list") && !player.isOp()) {
+					if(!permission.playerHas(player, "submit.list") && !sender.isOp()) {
 						sender.sendMessage(ChatColor.RED + "You don't have permission to do this.");
 						return true;
 					}
@@ -64,7 +64,8 @@ public class Submit extends JavaPlugin {
 					
 					
 				} else if(args[0].equals("clear")) {
-					if(!permission.playerHas(player, "submit.clear") && !player.isOp()) {
+					
+					if(!permission.playerHas(player, "submit.clear") && !sender.isOp()) {
 						sender.sendMessage(ChatColor.RED + "You don't have permission to do this.");
 						return true;
 					}
@@ -78,7 +79,7 @@ public class Submit extends JavaPlugin {
 					return true;
 					
 				} else if(args[0].equals("open")) {
-					if(!permission.playerHas(player, "submit.open") && !player.isOp()) {
+					if(!permission.playerHas(player, "submit.open") && !sender.isOp()) {
 						sender.sendMessage(ChatColor.RED + "You don't have permission to do this.");
 						return true;
 					}
@@ -87,13 +88,13 @@ public class Submit extends JavaPlugin {
 					
 					saveConfig();
 					
-					sender.sendMessage(ChatColor.GRAY + "You have "+ChatColor.BOLD+"opened"+ChatColor.RESET+" submissions");
+					sender.sendMessage(ChatColor.GRAY + "You have "+ChatColor.BOLD+"opened"+ChatColor.GRAY+" submissions");
 					
 					return true;
 					
 				} else if(args[0].equals("close")) {
 					
-					if(!permission.playerHas(player, "submit.open") && !player.isOp()) {
+					if(!permission.playerHas(player, "submit.open") && !sender.isOp()) {
 						sender.sendMessage(ChatColor.RED + "You don't have permission to do this.");
 						return true;
 					}
@@ -102,12 +103,17 @@ public class Submit extends JavaPlugin {
 					
 					saveConfig();
 					
-					sender.sendMessage(ChatColor.GRAY + "You have "+ChatColor.BOLD+"closed"+ChatColor.RESET+" submissions.");
+					sender.sendMessage(ChatColor.GRAY + "You have "+ChatColor.BOLD+"closed"+ChatColor.GRAY+" submissions.");
 					
 					return true;
 					
 				} else if(args[0].equals("view")) {
 				
+					if(!(sender instanceof Player)) {
+						sender.sendMessage("You can't view submissions from console.");
+						return true;
+					}
+					
 					if(!permission.playerHas(player, "submit.view") && !player.isOp()) {
 						sender.sendMessage(ChatColor.RED + "You don't have permission to do this.");
 						return true;
@@ -129,7 +135,7 @@ public class Submit extends JavaPlugin {
 					
 					
 						
-					sender.sendMessage(ChatColor.WHITE + "Teleporting you to "+ChatColor.BOLD+args[1]+ChatColor.RESET+"'s submission.");
+					sender.sendMessage(ChatColor.WHITE + "Teleporting you to "+ChatColor.BOLD+args[1]+ChatColor.WHITE+"'s submission.");
 					
 					Location l = new Location(Bukkit.getWorld(locationData[5]), Double.valueOf(locationData[0]), Double.valueOf(locationData[1]), Double.valueOf(locationData[2]));
 					
@@ -143,7 +149,7 @@ public class Submit extends JavaPlugin {
 				
 			} else {
 				if(!(sender instanceof Player)) {
-					sender.sendMessage(ChatColor.RED + "Only players can run this command!");
+					sender.sendMessage(ChatColor.RED + "Only players can make a submission.");
 					return true;
 				}
 				
