@@ -11,6 +11,24 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+/**
+ *  Submit: A simple plugin to submit the current location.
+ *  Copyright (C) 2014   MarkehMe / Mark Hughes <mark@markeh.me>
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 public class Submit extends JavaPlugin {
 	
 	public static Permission permission = null;
@@ -22,7 +40,7 @@ public class Submit extends JavaPlugin {
 		
 		saveConfig();
 		
-        RegisteredServiceProvider<Permission> permissionProvider = getServer().getServicesManager().getRegistration( net.milkbowl.vault.permission.Permission.class );
+        RegisteredServiceProvider<Permission> permissionProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
         if(permissionProvider != null) {
             permission = permissionProvider.getProvider();
         }
@@ -31,7 +49,7 @@ public class Submit extends JavaPlugin {
 		
 	}
 	
-	public boolean onCommand( CommandSender sender, Command command, String label, String[] args ) {
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(command.getName().equalsIgnoreCase("submit")) {
 			Player player = null;
 			
@@ -39,19 +57,28 @@ public class Submit extends JavaPlugin {
 				player = (Player) sender;
 			}
 			
+			String worldIdentifier = null;
+			
+			if(getConfig().getBoolean("separateByWorld")) {
+				worldIdentifier = player.getWorld().getName().toLowerCase();
+			} else {
+				worldIdentifier = "__Submit__.__Global__";
+			}
+			
 			if(args.length > 0) {
-				
 				if(args[0].equals("list")) {
-					if(!permission.playerHas(player, "submit.list") && !sender.isOp()) {
-						sender.sendMessage(ChatColor.RED + "You don't have permission to do this.");
-						return true;
+					if(sender instanceof Player) { 
+						if(!permission.playerHas(player, "submit.list") && !sender.isOp()) {
+							sender.sendMessage(ChatColor.RED + "You don't have permission to do this.");
+							return true;
+						}
 					}
 					
-					sender.sendMessage(ChatColor.WHITE + " --- Submissions --- ");
+					sender.sendMessage(ChatColor.AQUA + " --- "+ChatColor.BOLD+"Submissions"+ChatColor.RESET+ChatColor.AQUA+" --- ");
 					int i = 0;
 					
 					try {
-						for(String key : getConfig().getConfigurationSection("submissions").getKeys(false)) {
+						for(String key : getConfig().getConfigurationSection("submissions."+worldIdentifier).getKeys(false)) {
 							i++;
 							sender.sendMessage(i + ". " + key);
 						}
@@ -62,15 +89,16 @@ public class Submit extends JavaPlugin {
 					
 					return true;
 					
-					
 				} else if(args[0].equals("clear")) {
 					
-					if(!permission.playerHas(player, "submit.clear") && !sender.isOp()) {
-						sender.sendMessage(ChatColor.RED + "You don't have permission to do this.");
-						return true;
+					if(sender instanceof Player) { 
+						if(!permission.playerHas(player, "submit.clear") && !sender.isOp()) {
+							sender.sendMessage(ChatColor.RED + "You don't have permission to do this.");
+							return true;
+						}
 					}
 					
-					getConfig().set("submissions", null);
+					getConfig().set("submissions."+worldIdentifier, null);
 					
 					saveConfig();
 					
@@ -79,31 +107,36 @@ public class Submit extends JavaPlugin {
 					return true;
 					
 				} else if(args[0].equals("open")) {
-					if(!permission.playerHas(player, "submit.open") && !sender.isOp()) {
-						sender.sendMessage(ChatColor.RED + "You don't have permission to do this.");
-						return true;
+					
+					if(sender instanceof Player) { 
+						if(!permission.playerHas(player, "submit.open") && !sender.isOp()) {
+							sender.sendMessage(ChatColor.RED + "You don't have permission to do this.");
+							return true;
+						}
 					}
 					
 					getConfig().set("open", true);
 					
 					saveConfig();
 					
-					sender.sendMessage(ChatColor.GRAY + "You have "+ChatColor.BOLD+"opened"+ChatColor.GRAY+" submissions");
+					sender.sendMessage(ChatColor.GRAY + "You have "+ChatColor.BOLD+"opened"+ChatColor.RESET+""+ChatColor.GRAY+" submissions");
 					
 					return true;
 					
 				} else if(args[0].equals("close")) {
 					
-					if(!permission.playerHas(player, "submit.open") && !sender.isOp()) {
-						sender.sendMessage(ChatColor.RED + "You don't have permission to do this.");
-						return true;
+					if(sender instanceof Player) { 
+						if(!permission.playerHas(player, "submit.open") && !sender.isOp()) {
+							sender.sendMessage(ChatColor.RED + "You don't have permission to do this.");
+							return true;
+						}
 					}
 					
 					getConfig().set("open", false);
 					
 					saveConfig();
 					
-					sender.sendMessage(ChatColor.GRAY + "You have "+ChatColor.BOLD+"closed"+ChatColor.GRAY+" submissions.");
+					sender.sendMessage(ChatColor.GRAY + "You have "+ChatColor.BOLD+"closed"+ChatColor.RESET+""+ChatColor.GRAY+" submissions.");
 					
 					return true;
 					
@@ -125,16 +158,14 @@ public class Submit extends JavaPlugin {
 						return true;
 					}
 					
-					if(getConfig().getString("submissions."+args[1].toLowerCase()+".l") == null) {
+					if(getConfig().getString("submissions."+worldIdentifier+"."+args[1].toLowerCase()+".l") == null) {
 						sender.sendMessage(ChatColor.GRAY + "This player has not made a submission.");
 
 						return true;
 					}
 					
-					String[] locationData = getConfig().getString("submissions."+args[1].toLowerCase()+".l").split(" ");
+					String[] locationData = getConfig().getString("submissions."+worldIdentifier+"."+args[1].toLowerCase()+".l").split(" ");
 					
-					
-						
 					sender.sendMessage(ChatColor.WHITE + "Teleporting you to "+ChatColor.BOLD+args[1]+ChatColor.WHITE+"'s submission.");
 					
 					Location l = new Location(Bukkit.getWorld(locationData[5]), Double.valueOf(locationData[0]), Double.valueOf(locationData[1]), Double.valueOf(locationData[2]));
@@ -145,6 +176,18 @@ public class Submit extends JavaPlugin {
 					player.teleport(l);
 					
 					return true;
+				} else if(args[0].equalsIgnoreCase("reload")) {
+					if(sender instanceof Player) {
+						if(!permission.playerHas(player, "submit.reload") && !player.isOp()) {
+							sender.sendMessage(ChatColor.RED + "You don't have permission to do this.");
+							return true;
+						}
+					}
+					
+					reloadConfig();
+					sender.sendMessage(ChatColor.GREEN + "Configuration reloaded.");
+					
+					return true;
 				}
 				
 			} else {
@@ -153,9 +196,11 @@ public class Submit extends JavaPlugin {
 					return true;
 				}
 				
-				if(!permission.playerHas(player, "submit.use") && !player.isOp()) {
-					sender.sendMessage(ChatColor.RED + "You don't have permission to do this.");
-					return true;
+				if(sender instanceof Player) { 
+					if(!permission.playerHas(player, "submit.use") && !player.isOp()) {
+						sender.sendMessage(ChatColor.RED + "You don't have permission to do this.");
+						return true;
+					}
 				}
 				
 				
@@ -168,7 +213,7 @@ public class Submit extends JavaPlugin {
 									player.getLocation().getYaw() + " " +
 									player.getLocation().getWorld().getName();
 					
-					getConfig().set("submissions."+player.getName().toLowerCase() + ".l", data);
+					getConfig().set("submissions."+worldIdentifier+"."+player.getName().toLowerCase() + ".l", data);
 					
 					saveConfig();
 					
