@@ -2,13 +2,13 @@ name: Submit
 main: markehme.submit.Submit
 authors: ['MarkehMe']
 website: http://markeh.me
-version: 1.0.0
+version: 1.0.1
 dev-url: http://dev.bukkit.org/bukkit-plugins/submit/
 depend: [ Vault ] 
 commands:
   submit:
     description: Submit to the current competition! 
-    usage: "Usage: '/submit [optionalargument]'"
+    usage: "Usage: '/submit [optional]'"
 permissions:
   submit.use:
     default: true
@@ -25,3 +25,6 @@ permissions:
   submit.view:
     default: false
     description: allows using /submit view <player>
+  submit.reload:
+    default: false
+    description: allows using /submit reload
